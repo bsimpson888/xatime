@@ -1,0 +1,43 @@
+$esGreen: #94be1f;
+$lightGreen: #a8f1a1;
+
+$okGreen: $esGreen;
+
+
+$white: #fff;
+$grey0: darken( $white, 10% );
+$grey1: darken( $white, 20% );
+$grey2: darken( $white, 30% );
+$grey3: darken( $white, 40% );
+$grey4: darken( $white, 50% );
+$grey5: darken( $white, 80% );
+
+$green: #14ac2e;
+$redred: #f00000;
+
+$black: #000;
+$darkRed: #aa0000;
+$nokRed: #991212;
+
+$treeMenuBackground: $grey0;
+$selectedItemBorder: $black;
+$selectedItemBackground: #fffec9;
+$lineEditBackground: $white;
+$lineEditBorder: $grey1;
+$unSelectedItemBorder: $grey1;
+$unSelectedItemBackground: $white;
+$checkedLineEditColor: $lightGreen;
+$tableAlternatingColor: $grey0;
+
+
+QWidget {
+  font-family: arial;
+  font-size: 10pt;
+}
+
+TerminalView {
+  background: $grey0;
+  width: 640px;
+  height: 480px;
+}
+
