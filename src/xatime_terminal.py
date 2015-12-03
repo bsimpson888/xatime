@@ -3,6 +3,7 @@
 import sys
 
 from PyQt4.QtGui import QApplication
+from scss import Scss
 
 from XATime.TerminalView import TerminalView
 
@@ -14,13 +15,14 @@ class xatime_terminal(object):
         self.app = QApplication(sys.argv)
         self.tv = TerminalView()
         self.tv.show()
+        self.app.setStyleSheet(self.loadCss())
         self.app.exec_()
 
     def loadCss(self):
         scss = Scss()
-        scss_data = open("xatime_terminal.scss")
+        scss_data = open("xatime_terminal.scss", "rb").read()
         css = scss.compile(scss_data)
-        print css
+        return css
 
 
 if __name__ == '__main__':

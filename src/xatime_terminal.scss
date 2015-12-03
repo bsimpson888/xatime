@@ -32,12 +32,17 @@ $tableAlternatingColor: $grey0;
 
 QWidget {
   font-family: arial;
-  font-size: 10pt;
+  font-size: 12px;
 }
 
 TerminalView {
-  background: $grey0;
-  width: 640px;
-  height: 480px;
+  background: $grey1;
+  #labelClock {
+    font-size: 32px;
+  }
+  #labelMode {
+    font-size: 32px;
+  }
 }
+
 
