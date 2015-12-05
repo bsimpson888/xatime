@@ -46,6 +46,7 @@ TerminalView {
 
   QToolButton {
     max-width: 150px;
+    min-width: 150px;
     background: $esGreen2;
     border: 3px solid $esGreen2;
     border-radius: 10px;
