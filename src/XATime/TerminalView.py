@@ -4,6 +4,9 @@ import datetime
 import time
 
 import sys
+
+import pymysql
+import yaml
 from PyQt4.QtCore import QTimer, Qt, QSize, QCoreApplication, QEventLoop
 from PyQt4.QtGui import QDialog, QPicture, QIcon, QKeyEvent
 
@@ -40,11 +43,34 @@ class TerminalView(QDialog, Ui_TerminalView):
             self.MODUS_STATUS: self.slotStatus,
         }
 
+
+        self.loadConfig()
+
+
         self.inputString = ""
         self.setupUi(self)
         self.setupWidgets()
         self.setupTimer()
         self.setMode(self.MODUS_KOMMEN)
+
+    def dbQueryDict(self, sql):
+        con = pymysql.connect(
+            host=self.config["host"],
+            user=self.config["user"],
+            passwd=self.config["passwd"],
+            db=self.config["db"],
+        )
+        cur = con.cursor(pymysql.cursors.DictCursor)
+        cur.execute(sql)
+
+        ret = cur.fetchall()
+        con.close()
+
+        return ret
+
+    def loadConfig(self):
+        self.config = yaml.load(open("xatime.yaml"))["database"]
+
 
     def setupWidgets(self):
         self.pbKommen.setIconSize(QSize(100, 100))
@@ -80,7 +106,7 @@ class TerminalView(QDialog, Ui_TerminalView):
         self.clockTimer.start()
 
     def slotClockTimerTimeOut(self):
-        self.labelClock.setText("{dt:%a %d.%m.%Y   %H:%M}".format(dt=datetime.datetime.now()))
+        self.labelClock.setText("{dt:%a.  %d.%m.%Y  %H:%M}".format(dt=datetime.datetime.now()))
 
     def slotButtonPressed(self):
         sender = self.sender()
@@ -137,6 +163,7 @@ class TerminalView(QDialog, Ui_TerminalView):
         self.setAllButtonsEnabled(True)
 
     def slotKommen(self, badge):
+        sql = "select "
         self.message("{NAME}\n\nKommen registriert.".format(NAME=badge), 2)
 
 

@@ -1,0 +1,5 @@
+database:
+  host: "192.168.178.42"
+  user: "root"
+  passwd: "dpaeiob"
+  db: "xatime"
