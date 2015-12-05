@@ -55,18 +55,32 @@ TerminalView {
     color: $white;
 
     &:hover {
-      border: 3px solid $white;
+      border: 3px solid $esGreen2;
     }
     &:pressed {
       background: $black;
       border: 3px solid $black;
     }
+
+
   }
 
+  #pbStatus, #pbPause{
+      max-height: 100px;
+  }
+
+  #pbMode {
+    max-width: 1000px;
+    max-height: 1000px;
+    background: $esGreen;
+    border: 3px solid $esGreen;
+    font-size: 60px;
+  }
 
   #labelClock {
 
     font-size: 60px;
+    margin-bottom: 30px;
   }
   #labelMode {
     font-size: 32px;

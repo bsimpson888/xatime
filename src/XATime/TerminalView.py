@@ -19,6 +19,13 @@ class TerminalView(QDialog, Ui_TerminalView):
         MODUS_STATUS: "Status"
     }
 
+    modeIcons = {
+        MODUS_KOMMEN: ":/icons/kommen.svg",
+        MODUS_GEHEN: ":/icons/gehen.svg",
+        MODUS_PAUSE: ":/icons/pause.svg",
+        MODUS_STATUS: ":/icons/status.svg"
+    }
+
     def __init__(self, parent=None):
         super(TerminalView, self).__init__(parent)
         self.setupUi(self)
@@ -28,27 +35,29 @@ class TerminalView(QDialog, Ui_TerminalView):
 
     def setupWidgets(self):
         self.pbKommen.setIconSize(QSize(100, 100))
-        self.pbKommen.setIcon(QIcon(":/icons/kommen.svg"))
+        self.pbKommen.setIcon(QIcon(self.modeIcons[self.MODUS_KOMMEN]))
 
         self.pbGehen.setIconSize(QSize(100, 100))
-        self.pbGehen.setIcon(QIcon(":/icons/gehen.svg"))
+        self.pbGehen.setIcon(QIcon(self.modeIcons[self.MODUS_GEHEN]))
 
         self.pbPause.setIconSize(QSize(50, 50))
-        self.pbPause.setIcon(QIcon(":/icons/pause.svg"))
+        self.pbPause.setIcon(QIcon(self.modeIcons[self.MODUS_PAUSE]))
 
         self.pbStatus.setIconSize(QSize(50, 50))
-        self.pbStatus.setIcon(QIcon(":/icons/status.svg"))
+        self.pbStatus.setIcon(QIcon(self.modeIcons[self.MODUS_STATUS]))
 
 
+        self.pbKommen.pressed.connect(self.slotButtonPressed)
+        self.pbGehen.pressed.connect(self.slotButtonPressed)
+        self.pbPause.pressed.connect(self.slotButtonPressed)
+        self.pbStatus.pressed.connect(self.slotButtonPressed)
+
+        self.teDaten.hide()
         # self.showFullScreen()
         # self.setCursor(Qt.BlankCursor)
         self.resize(800, 480)
 
-        # icon = QIcon("icons_log.svg")
-        # pixmap = icon.pixmap(24, 24)
-        # print icon
-        # self.labelStatus.setPixmap(pixmap)
-        # self.pbKommen.setIcon(icon)
+
 
     def setupTimer(self):
         self.clockTimer = QTimer()
@@ -59,6 +68,22 @@ class TerminalView(QDialog, Ui_TerminalView):
     def slotClockTimerTimeOut(self):
         self.labelClock.setText("{dt:%d.%m.%Y   %H:%M}".format(dt=datetime.datetime.now()))
 
+    def slotButtonPressed(self):
+        sender = self.sender()
+        if sender == self.pbKommen:
+            mode = self.MODUS_KOMMEN
+        elif sender == self.pbGehen:
+            mode = self.MODUS_GEHEN
+        elif sender == self.pbStatus:
+            mode = self.MODUS_STATUS
+        elif sender == self.pbPause:
+            mode = self.MODUS_PAUSE
+
+        self.setMode(mode)
+
+
     def setMode(self, mode):
         self.mode = mode
-        self.labelMiddleLower.setText(self.modeTexts[mode])
+        self.pbMode.setText(self.modeTexts[mode])
+        self.pbMode.setIconSize(QSize(200,200))
+        self.pbMode.setIcon(QIcon(self.modeIcons[mode]))
