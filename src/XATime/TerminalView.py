@@ -1,15 +1,19 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import datetime
-from PyQt4.QtCore import QTimer, Qt, QSize
-from PyQt4.QtGui import QDialog, QPicture, QIcon
+import time
+
+import sys
+from PyQt4.QtCore import QTimer, Qt, QSize, QCoreApplication, QEventLoop
+from PyQt4.QtGui import QDialog, QPicture, QIcon, QKeyEvent
+
+from XATime.AsyncFuncQt import AsyncFuncQt
 from XATime.ui.Ui_TerminalView import Ui_TerminalView
 
 __author__ = 'Marco Bartel'
 
 
 class TerminalView(QDialog, Ui_TerminalView):
-
     MODUS_KOMMEN, MODUS_GEHEN, MODUS_PAUSE, MODUS_STATUS = range(4)
 
     modeTexts = {
@@ -26,8 +30,17 @@ class TerminalView(QDialog, Ui_TerminalView):
         MODUS_STATUS: ":/icons/status.svg"
     }
 
+
     def __init__(self, parent=None):
         super(TerminalView, self).__init__(parent)
+        self.modeSlots = {
+            self.MODUS_KOMMEN: self.slotKommen,
+            self.MODUS_GEHEN: self.slotGehen,
+            self.MODUS_PAUSE: self.slotPause,
+            self.MODUS_STATUS: self.slotStatus,
+        }
+
+        self.inputString = ""
         self.setupUi(self)
         self.setupWidgets()
         self.setupTimer()
@@ -46,18 +59,19 @@ class TerminalView(QDialog, Ui_TerminalView):
         self.pbStatus.setIconSize(QSize(50, 50))
         self.pbStatus.setIcon(QIcon(self.modeIcons[self.MODUS_STATUS]))
 
-
         self.pbKommen.pressed.connect(self.slotButtonPressed)
         self.pbGehen.pressed.connect(self.slotButtonPressed)
         self.pbPause.pressed.connect(self.slotButtonPressed)
         self.pbStatus.pressed.connect(self.slotButtonPressed)
 
-        self.teDaten.hide()
-        # self.showFullScreen()
-        # self.setCursor(Qt.BlankCursor)
-        self.resize(800, 480)
+        self.labelDaten.hide()
 
 
+        if sys.platform == "posix":
+            self.showFullScreen()
+            self.setCursor(Qt.BlankCursor)
+        else:
+            self.resize(800, 480)
 
     def setupTimer(self):
         self.clockTimer = QTimer()
@@ -66,7 +80,7 @@ class TerminalView(QDialog, Ui_TerminalView):
         self.clockTimer.start()
 
     def slotClockTimerTimeOut(self):
-        self.labelClock.setText("{dt:%d.%m.%Y   %H:%M}".format(dt=datetime.datetime.now()))
+        self.labelClock.setText("{dt:%a %d.%m.%Y   %H:%M}".format(dt=datetime.datetime.now()))
 
     def slotButtonPressed(self):
         sender = self.sender()
@@ -81,9 +95,57 @@ class TerminalView(QDialog, Ui_TerminalView):
 
         self.setMode(mode)
 
-
     def setMode(self, mode):
         self.mode = mode
         self.pbMode.setText(self.modeTexts[mode])
-        self.pbMode.setIconSize(QSize(200,200))
+        self.pbMode.setIconSize(QSize(200, 200))
         self.pbMode.setIcon(QIcon(self.modeIcons[mode]))
+
+    def keyPressEvent(self, event):
+        if type(event) == QKeyEvent:
+            if event.key() == Qt.Key_Return:
+                self.slotNewBadgeString(self.inputString)
+                self.inputString = ""
+            if event.key() < 127:
+                self.inputString += chr(int(event.key()))
+            event.accept()
+        else:
+            event.ignore()
+
+
+    @AsyncFuncQt(await=True)
+    def qtsleep(self, s):
+        time.sleep(s)
+
+    def message(self, message, sec):
+        self.labelDaten.setText(message)
+        self.pbMode.hide()
+        self.labelDaten.show()
+        self.qtsleep(2)
+        self.labelDaten.hide()
+        self.pbMode.show()
+
+    def setAllButtonsEnabled(self, state):
+        self.pbKommen.setEnabled(state)
+        self.pbGehen.setEnabled(state)
+        self.pbPause.setEnabled(state)
+        self.pbStatus.setEnabled(state)
+
+    def slotNewBadgeString(self, badge):
+        self.setAllButtonsEnabled(False)
+        self.modeSlots[self.mode](badge.strip())
+        self.setAllButtonsEnabled(True)
+
+    def slotKommen(self, badge):
+        self.message("{NAME}\n\nKommen registriert.".format(NAME=badge), 2)
+
+
+    def slotGehen(self, badge):
+        pass
+
+    def slotStatus(self, badge):
+        pass
+
+    def slotPause(self, badge):
+        pass
+

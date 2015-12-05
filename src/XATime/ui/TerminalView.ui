@@ -107,7 +107,14 @@
         </widget>
        </item>
        <item>
-        <widget class="QTextEdit" name="teDaten"/>
+        <widget class="QLabel" name="labelDaten">
+         <property name="text">
+          <string>N/A</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+        </widget>
        </item>
       </layout>
      </item>

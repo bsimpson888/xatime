@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+import locale
 import os
 import sys
 
@@ -13,6 +14,13 @@ __author__ = 'Marco Bartel'
 
 class xatime_terminal(object):
     def __init__(self):
+        if sys.platform == "posix":
+            os.environ["DISPLAY"] = ":0.0"
+            locale.setlocale(locale.LC_ALL, 'de_DE')
+        else:
+            print sys.platform
+            locale.setlocale(locale.LC_ALL, 'deu_deu')
+
         self.app = QApplication(sys.argv)
         self.tv = TerminalView()
         self.tv.show()
@@ -27,5 +35,4 @@ class xatime_terminal(object):
 
 
 if __name__ == '__main__':
-    os.environ["DISPLAY"] = ":0.0"
     xtt = xatime_terminal()
