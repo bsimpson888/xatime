@@ -93,7 +93,7 @@ class TerminalView(QDialog, Ui_TerminalView):
         self.labelDaten.hide()
 
 
-        if sys.platform == "posix":
+        if sys.platform in ("posix", "linux2"):
             self.showFullScreen()
             self.setCursor(Qt.BlankCursor)
         else:
@@ -130,8 +130,10 @@ class TerminalView(QDialog, Ui_TerminalView):
     def keyPressEvent(self, event):
         if type(event) == QKeyEvent:
             if event.key() == Qt.Key_Return:
-                self.slotNewBadgeString(self.inputString)
+                badge = self.inputString
                 self.inputString = ""
+                self.slotNewBadgeString(badge)
+
             if event.key() < 127:
                 self.inputString += chr(int(event.key()))
             event.accept()
@@ -163,9 +165,13 @@ class TerminalView(QDialog, Ui_TerminalView):
         self.setAllButtonsEnabled(True)
 
     def slotKommen(self, badge):
-        sql = "select "
-        self.message("{NAME}\n\nKommen registriert.".format(NAME=badge), 2)
-
+        sql = "select ID, NAME from xatime_badges where BADGE_NR='{badge}'".format(badge=badge)
+        r = self.dbQueryDict(sql)
+        if len(r) != 0:
+            d = r[0]
+            self.message("{name}\n\nKommen registriert.".format(name=d["NAME"]), 2)
+        else:
+            self.message("Badge {badge}\n\nnicht erkannt.".format(badge=badge), 2)
 
     def slotGehen(self, badge):
         pass

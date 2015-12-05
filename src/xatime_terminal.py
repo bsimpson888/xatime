@@ -14,11 +14,11 @@ __author__ = 'Marco Bartel'
 
 class xatime_terminal(object):
     def __init__(self):
-        if sys.platform == "posix":
+        print sys.platform
+        if sys.platform in ("posix", "linux2"):
             os.environ["DISPLAY"] = ":0.0"
-            locale.setlocale(locale.LC_ALL, 'de_DE')
+            locale.setlocale(locale.LC_ALL, 'de_DE.UTF-8')
         else:
-            print sys.platform
             locale.setlocale(locale.LC_ALL, 'deu_deu')
 
         self.app = QApplication(sys.argv)
