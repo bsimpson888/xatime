@@ -1,7 +1,9 @@
 $esGreen: #94be1f;
+$esGreen2: darken($esGreen, 10%);
 $lightGreen: #a8f1a1;
 
 $okGreen: $esGreen;
+
 
 
 $white: #fff;
@@ -32,13 +34,38 @@ $tableAlternatingColor: $grey0;
 
 QWidget {
   font-family: arial;
-  font-size: 12px;
 }
 
 TerminalView {
-  background: $grey1;
-  #labelClock {
+  background: $esGreen;
+
+  QLabel {
+     color: $white;
     font-size: 32px;
+  }
+
+  QToolButton {
+    max-width: 150px;
+    background: $esGreen2;
+    border: 3px solid $esGreen2;
+    border-radius: 10px;
+    font-size: 32px;
+    margin:10px;
+    color: $white;
+
+    &:hover {
+      border: 3px solid $white;
+    }
+    &:pressed {
+      background: $black;
+      border: 3px solid $black;
+    }
+  }
+
+
+  #labelClock {
+
+    font-size: 60px;
   }
   #labelMode {
     font-size: 32px;

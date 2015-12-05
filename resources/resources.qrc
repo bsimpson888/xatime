@@ -1,0 +1,8 @@
+<RCC>
+    <qresource prefix="/icons">
+        <file>kommen.svg</file>
+        <file>gehen.svg</file>
+        <file>status.svg</file>
+        <file>pause.svg</file>
+    </qresource>
+</RCC>
