@@ -1,5 +1,5 @@
 database:
-  host: "192.168.178.42"
+  host: "eslnx.electronic-shop.lu"
   user: "root"
   passwd: "dpaeiob"
   db: "xatime"
