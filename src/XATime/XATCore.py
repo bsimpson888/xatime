@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+import os
+
 import pymysql
 import yaml
 
@@ -7,6 +9,8 @@ __author__ = 'Marco Bartel'
 
 
 class XATCore(object):
+    configPath = "."
+
     def __init__(self):
         self.loadConfig()
 
@@ -25,7 +29,8 @@ class XATCore(object):
         return ret
 
     def loadConfig(self):
-        self.config = yaml.load(open("xatime.yaml"))["database"]
+        path = os.path.join(self.configPath, "xatime.yaml")
+        self.config = yaml.load(open(path))["database"]
 
     def getBadgeByBadgeNumber(self, badge=None):
         sql = "select ID from xatime_badges where BADGE_NR='{badge}'".format(badge=badge)
@@ -35,7 +40,7 @@ class XATCore(object):
         return None
 
     class Badge(object):
-        def __init__self(self, core=None, ID=None):
+        def __init__(self, core=None, ID=None):
             super(XATCore.Badge, self).__init__()
             self.core = core
             self.ID = ID
@@ -56,3 +61,20 @@ class XATCore(object):
             if len(r) != 0:
                 for key, value in r[0].items():
                     setattr(self, key, value)
+
+        def save(self):
+            sql = """
+            update xatime_badges
+            set BADGE_NR='{BADGE_NR}',
+            NAME='{NAME}',
+            USERNAME='{USERNAME}',
+            EMAIL='{EMAIL}'
+            WHERE ID={ID}
+            """.format(
+                BADGE_NR=self.BADGE_NR,
+                NAME=self.NAME,
+                USERNAME=self.USERNAME,
+                EMAIL=self.EMAIL,
+                ID=self.ID
+            )
+            self.core.dbQueryDict(sql)
