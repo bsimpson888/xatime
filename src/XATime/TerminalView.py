@@ -1,22 +1,22 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import datetime
-import time
-
 import sys
+import time
 
 import pymysql
 import yaml
-from PyQt4.QtCore import QTimer, Qt, QSize, QCoreApplication, QEventLoop
-from PyQt4.QtGui import QDialog, QPicture, QIcon, QKeyEvent
+from PyQt4.QtCore import QTimer, Qt, QSize
+from PyQt4.QtGui import QDialog, QIcon, QKeyEvent
 
 from XATime.AsyncFuncQt import AsyncFuncQt
+from XATime.XATCore import XATCore
 from XATime.ui.Ui_TerminalView import Ui_TerminalView
 
 __author__ = 'Marco Bartel'
 
 
-class TerminalView(QDialog, Ui_TerminalView):
+class TerminalView(QDialog, Ui_TerminalView, XATCore):
     MODUS_KOMMEN, MODUS_GEHEN, MODUS_PAUSE, MODUS_STATUS = range(4)
 
     modeTexts = {
@@ -33,7 +33,6 @@ class TerminalView(QDialog, Ui_TerminalView):
         MODUS_STATUS: ":/icons/status.svg"
     }
 
-
     def __init__(self, parent=None):
         super(TerminalView, self).__init__(parent)
         self.modeSlots = {
@@ -42,10 +41,6 @@ class TerminalView(QDialog, Ui_TerminalView):
             self.MODUS_PAUSE: self.slotPause,
             self.MODUS_STATUS: self.slotStatus,
         }
-
-
-        self.loadConfig()
-
 
         self.inputString = ""
         self.setupUi(self)
@@ -68,8 +63,6 @@ class TerminalView(QDialog, Ui_TerminalView):
 
         return ret
 
-    def loadConfig(self):
-        self.config = yaml.load(open("xatime.yaml"))["database"]
 
 
     def setupWidgets(self):
