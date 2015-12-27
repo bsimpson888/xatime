@@ -16,7 +16,7 @@ from XATime.ui.Ui_TerminalView import Ui_TerminalView
 __author__ = 'Marco Bartel'
 
 
-class TerminalView(QDialog, Ui_TerminalView, XATCore):
+class TerminalView(XATCore, QDialog, Ui_TerminalView):
     MODUS_KOMMEN, MODUS_GEHEN, MODUS_PAUSE, MODUS_STATUS = range(4)
 
     modeTexts = {
@@ -34,7 +34,8 @@ class TerminalView(QDialog, Ui_TerminalView, XATCore):
     }
 
     def __init__(self, parent=None):
-        super(TerminalView, self).__init__(parent)
+        XATCore.__init__(self)
+        QDialog.__init__(self, parent)
         self.modeSlots = {
             self.MODUS_KOMMEN: self.slotKommen,
             self.MODUS_GEHEN: self.slotGehen,
@@ -47,21 +48,6 @@ class TerminalView(QDialog, Ui_TerminalView, XATCore):
         self.setupWidgets()
         self.setupTimer()
         self.setMode(self.MODUS_KOMMEN)
-
-    def dbQueryDict(self, sql):
-        con = pymysql.connect(
-            host=self.config["host"],
-            user=self.config["user"],
-            passwd=self.config["passwd"],
-            db=self.config["db"],
-        )
-        cur = con.cursor(pymysql.cursors.DictCursor)
-        cur.execute(sql)
-
-        ret = cur.fetchall()
-        con.close()
-
-        return ret
 
 
 
@@ -157,12 +143,10 @@ class TerminalView(QDialog, Ui_TerminalView, XATCore):
         self.modeSlots[self.mode](badge.strip())
         self.setAllButtonsEnabled(True)
 
-    def slotKommen(self, badge):
-        sql = "select ID, NAME from xatime_badges where BADGE_NR='{badge}'".format(badge=badge)
-        r = self.dbQueryDict(sql)
-        if len(r) != 0:
-            d = r[0]
-            self.message("{name}\n\nKommen registriert.".format(name=d["NAME"]), 2)
+    def slotKommen(self, BADGE_NR):
+        badge = self.getBadgeByBadgeNumber( BADGE_NR)
+        if badge:
+            self.message("{name}\n\nKommen registriert.".format(name=badge.NAME), 2)
         else:
             self.message("Badge {badge}\n\nnicht erkannt.".format(badge=badge), 2)
 

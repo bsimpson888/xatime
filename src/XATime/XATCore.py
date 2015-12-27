@@ -10,7 +10,6 @@ __author__ = 'Marco Bartel'
 
 class XATCore(object):
     configPath = "."
-
     def __init__(self):
         self.loadConfig()
 
@@ -36,7 +35,7 @@ class XATCore(object):
         sql = "select ID from xatime_badges where BADGE_NR='{badge}'".format(badge=badge)
         r = self.dbQueryDict(sql)
         if len(r) != 0:
-            return XATCore.Badge(r[0]["ID"])
+            return XATCore.Badge(self, r[0]["ID"])
         return None
 
     class Badge(object):
