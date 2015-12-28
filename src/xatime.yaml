@@ -1,6 +1,7 @@
 database:
 #  host: "192.168.178.42"
-  host: "localhost"
+#  host: "localhost"
+  host: "esdb1.e-s.intern"
   user: "root"
   passwd: "dpaeiob"
   db: "xatime"
