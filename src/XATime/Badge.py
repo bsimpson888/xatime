@@ -1,6 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
+import XATime
+
 __author__ = 'Marco Bartel'
 
 class Badge(object):
@@ -36,3 +38,9 @@ class Badge(object):
             BADGE_ID=self.BADGE_ID
         )
         self.core.dbQueryDict(sql)
+
+    def getUser(self):
+        user = XATime.User(core=self.core, USER_ID=self.USER_ID)
+        return user
+
+

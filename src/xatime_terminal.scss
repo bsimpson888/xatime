@@ -1,5 +1,6 @@
 $esGreen: #94be1f;
 $esGreen2: darken($esGreen, 10%);
+$esGreen3: darken($esGreen, 20%);
 $lightGreen: #a8f1a1;
 
 $okGreen: $esGreen;
@@ -12,7 +13,7 @@ $grey1: darken( $white, 20% );
 $grey2: darken( $white, 30% );
 $grey3: darken( $white, 40% );
 $grey4: darken( $white, 50% );
-$grey5: darken( $white, 80% );
+$grey5: darken( $white, 70% );
 
 $green: #14ac2e;
 $redred: #f00000;
@@ -48,6 +49,8 @@ TerminalView {
     max-width: 150px;
     min-width: 150px;
     background: $esGreen2;
+    //background: $grey4;
+    //border: 3px solid $grey5;
     border: 3px solid $esGreen2;
     border-radius: 10px;
     font-size: 32px;
@@ -55,7 +58,7 @@ TerminalView {
     color: $white;
 
     &:hover {
-      border: 3px solid $esGreen2;
+      border: 3px solid $black;
     }
     &:pressed {
       background: $black;

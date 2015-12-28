@@ -2,24 +2,24 @@
 # -*- coding: utf-8 -*-
 from unittest import TestCase
 
-from XATime.XATCore import XATCore
+import XATime
 
 __author__ = 'Marco Bartel'
 
 
 class TestUser(TestCase):
     def setUp(self):
-        XATCore.configPath = ".."
-        self.core = XATCore()
+        XATime.Core.configPath = ".."
+        self.core = XATime.Core()
 
     def test_load(self):
-        user = XATCore.User(core=self.core, USER_ID=1)
-        self.assertIsInstance(user, XATCore.User)
+        user = XATime.User(core=self.core, USER_ID=1)
+        self.assertIsInstance(user, XATime.User)
         self.assertTrue(hasattr(user, "USERNAME"))
 
     def test_save(self):
-        user = XATCore.User(core=self.core, USER_ID=1)
-        self.assertIsInstance(user, XATCore.User)
+        user = XATime.User(core=self.core, USER_ID=1)
+        self.assertIsInstance(user, XATime.User)
         oldUSERNAME = user.USERNAME
         user.USERNAME = "hautz"
         user.save()
@@ -30,3 +30,12 @@ class TestUser(TestCase):
         user.load()
         self.assertEqual(user.USERNAME, oldUSERNAME)
 
+    def test_getCurrentMode(self):
+        user = XATime.User(core=self.core, USER_ID=1)
+        self.assertIsInstance(user, XATime.User)
+        print user.getCurrentMode()
+
+    def test_newLog(self):
+        user = XATime.User(core=self.core, USER_ID=1)
+        self.assertIsInstance(user, XATime.User)
+        user.newLog(mode=XATime.Core.MODUS_KOMMEN, logTime=XATime.Core.now())

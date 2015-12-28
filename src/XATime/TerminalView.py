@@ -6,50 +6,42 @@ import time
 
 import pymysql
 import yaml
-from PyQt4.QtCore import QTimer, Qt, QSize
-from PyQt4.QtGui import QDialog, QIcon, QKeyEvent
+from PyQt4.QtCore import QTimer, Qt, QSize, QCoreApplication
+from PyQt4.QtGui import QDialog, QIcon, QKeyEvent, QColor, QPalette
 
 from XATime.AsyncFuncQt import AsyncFuncQt
-from XATime.XATCore import XATCore
+import XATime
 from XATime.ui.Ui_TerminalView import Ui_TerminalView
 
 __author__ = 'Marco Bartel'
 
 
-class TerminalView(XATCore, QDialog, Ui_TerminalView):
-    MODUS_KOMMEN, MODUS_GEHEN, MODUS_PAUSE, MODUS_STATUS = range(4)
-
+class TerminalView(XATime.Core, QDialog, Ui_TerminalView):
     modeTexts = {
-        MODUS_KOMMEN: "Kommen",
-        MODUS_GEHEN: "Gehen",
-        MODUS_PAUSE: "Pause",
-        MODUS_STATUS: "Status"
+        XATime.Core.MODUS_KOMMEN: "Kommen",
+        XATime.Core.MODUS_GEHEN: "Gehen",
+        XATime.Core.MODUS_PAUSE: "Pause",
+        XATime.Core.MODUS_STATUS: "Status"
     }
 
     modeIcons = {
-        MODUS_KOMMEN: ":/icons/kommen.svg",
-        MODUS_GEHEN: ":/icons/gehen.svg",
-        MODUS_PAUSE: ":/icons/pause.svg",
-        MODUS_STATUS: ":/icons/status.svg"
+        XATime.Core.MODUS_KOMMEN: ":/icons/kommen.svg",
+        XATime.Core.MODUS_GEHEN: ":/icons/gehen.svg",
+        XATime.Core.MODUS_PAUSE: ":/icons/pause.svg",
+        XATime.Core.MODUS_STATUS: ":/icons/status.svg"
     }
 
-    def __init__(self, parent=None):
-        XATCore.__init__(self)
-        QDialog.__init__(self, parent)
-        self.modeSlots = {
-            self.MODUS_KOMMEN: self.slotKommen,
-            self.MODUS_GEHEN: self.slotGehen,
-            self.MODUS_PAUSE: self.slotPause,
-            self.MODUS_STATUS: self.slotStatus,
-        }
+    COLOR_ALERT = "#A00"
+    COLOR_OK = "#080"
 
+    def __init__(self, parent=None):
+        XATime.Core.__init__(self)
+        QDialog.__init__(self, parent)
         self.inputString = ""
         self.setupUi(self)
         self.setupWidgets()
         self.setupTimer()
         self.setMode(self.MODUS_KOMMEN)
-
-
 
     def setupWidgets(self):
         self.pbKommen.setIconSize(QSize(100, 100))
@@ -71,7 +63,6 @@ class TerminalView(XATCore, QDialog, Ui_TerminalView):
 
         self.labelDaten.hide()
 
-
         if sys.platform in ("posix", "linux2"):
             self.showFullScreen()
             self.setCursor(Qt.BlankCursor)
@@ -85,7 +76,7 @@ class TerminalView(XATCore, QDialog, Ui_TerminalView):
         self.clockTimer.start()
 
     def slotClockTimerTimeOut(self):
-        self.labelClock.setText("{dt:%a.  %d.%m.%Y  %H:%M}".format(dt=datetime.datetime.now()))
+        self.labelClock.setText("{dt:%a.  %d.%m.%Y  %H:%M}".format(dt=self.now()))
 
     def slotButtonPressed(self):
         sender = self.sender()
@@ -119,43 +110,77 @@ class TerminalView(XATCore, QDialog, Ui_TerminalView):
         else:
             event.ignore()
 
-
     @AsyncFuncQt(await=True)
     def qtsleep(self, s):
         time.sleep(s)
 
-    def message(self, message, sec):
+    def message(self, message, sec, color=None):
+        wdgs = [
+            self.pbGehen,
+            self.pbKommen,
+            self.pbPause,
+            self.pbStatus,
+            self.pbMode
+        ]
+        if color:
+            self.setStyleSheet("""
+                TerminalView {{background: {color};}}
+                # QToolButton {{background: {color}; border: {color};}}
+            """.format(color=color))
+
         self.labelDaten.setText(message)
-        self.pbMode.hide()
+        for wdg in wdgs:
+            wdg.hide()
+
         self.labelDaten.show()
-        self.qtsleep(2)
+        self.qtsleep(sec)
         self.labelDaten.hide()
-        self.pbMode.show()
+        for wdg in wdgs:
+            wdg.show()
+
+        if color:
+            self.setStyleSheet("")
 
     def setAllButtonsEnabled(self, state):
-        self.pbKommen.setEnabled(state)
-        self.pbGehen.setEnabled(state)
-        self.pbPause.setEnabled(state)
-        self.pbStatus.setEnabled(state)
+        wdgs = [
+            self.pbGehen,
+            self.pbKommen,
+            self.pbPause,
+            self.pbStatus
+        ]
+        for wdg in wdgs:
+            wdg.setEnabled(state)
 
-    def slotNewBadgeString(self, badge):
+    def slotNewBadgeString(self, BADGE_NR):
+        ok = False
         self.setAllButtonsEnabled(False)
-        self.modeSlots[self.mode](badge.strip())
-        self.setAllButtonsEnabled(True)
 
-    def slotKommen(self, BADGE_NR):
-        badge = self.getBadgeByBadgeNumber( BADGE_NR)
+        BADGE_NR = BADGE_NR.strip()
+        badge = self.getBadgeByBadgeNumber(BADGE_NR)
         if badge:
-            self.message("{name}\n\nKommen registriert.".format(name=badge.NAME), 2)
-        else:
-            self.message("Badge {badge}\n\nnicht erkannt.".format(badge=badge), 2)
+            user = badge.getUser()
+            if user:
+                ok = True
+                if self.mode in (XATime.Core.MODUS_KOMMEN, XATime.Core.MODUS_GEHEN, XATime.Core.MODUS_PAUSE):
+                    now = self.now()
+                    user.newLog(mode=self.mode, logTime=now)
+                    self.message(
+                        "{NAME}\n\n{MODE_NAME} registriert.\n\nZeit: {dt:%H:%M}".format(
+                            NAME=user.NAME,
+                            MODE_NAME=self.modeTexts[self.mode],
+                            dt=now,
+                        ),
+                        2,
+                        color=self.COLOR_OK
+                    )
 
-    def slotGehen(self, badge):
-        pass
+                elif self.mode == XATime.Core.MODUS_STATUS:
+                    self.message("""{name}\n\nSaldo:\n(1) +35 Minuten\n(2) +230 Minuten""".format(name=user.NAME), 10, color=self.COLOR_OK)
 
-    def slotStatus(self, badge):
-        pass
 
-    def slotPause(self, badge):
-        pass
 
+
+        if not ok:
+            self.message("Badge {BADGE_NR}\n\nnicht erkannt.".format(BADGE_NR=BADGE_NR), 2, color=self.COLOR_ALERT)
+
+        self.setAllButtonsEnabled(True)

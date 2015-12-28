@@ -2,18 +2,23 @@
 # -*- coding: utf-8 -*-
 import os
 
+import datetime
 import pymysql
 import yaml
 
-from XATime.Badge import Badge
-from XATime.User import User
+import XATime
+
 __author__ = 'Marco Bartel'
 
 
-class XATCore(object):
+class Core(object):
     configPath = "."
-    Badge = Badge
-    User = User
+
+    MODUS_KOMMEN, MODUS_GEHEN, MODUS_PAUSE, MODUS_STATUS = range(1, 5, 1)
+
+    @classmethod
+    def now(self):
+        return datetime.datetime.now().replace(second=0, microsecond=0)
 
     def __init__(self):
         self.loadConfig()
@@ -36,9 +41,21 @@ class XATCore(object):
         path = os.path.join(self.configPath, "xatime.yaml")
         self.config = yaml.load(open(path))["database"]
 
-    def getBadgeByBadgeNumber(self, badge=None):
-        sql = "select ID from xatime_badges where BADGE_NR='{badge}'".format(badge=badge)
+    def getBadgeByBadgeNumber(self, BADGE_NR=None):
+        sql = """
+        select
+          BADGE_ID
+        from xatime_badges
+        where BADGE_NR='{BADGE_NR}'
+        """.format(BADGE_NR=BADGE_NR)
         r = self.dbQueryDict(sql)
         if len(r) != 0:
-            return XATCore.Badge(self, r[0]["ID"])
+            return XATime.Badge(self, r[0]["BADGE_ID"])
         return None
+
+
+    def mysqlDateTime(self, dt):
+        if dt:
+            return "'{dt:%Y-%m-%d  %H:%M:%S}'".format(dt=dt)
+        else:
+            return "null"
