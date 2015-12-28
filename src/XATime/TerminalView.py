@@ -1,22 +1,22 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import datetime
-import time
-
 import sys
+import time
 
 import pymysql
 import yaml
-from PyQt4.QtCore import QTimer, Qt, QSize, QCoreApplication, QEventLoop
-from PyQt4.QtGui import QDialog, QPicture, QIcon, QKeyEvent
+from PyQt4.QtCore import QTimer, Qt, QSize
+from PyQt4.QtGui import QDialog, QIcon, QKeyEvent
 
 from XATime.AsyncFuncQt import AsyncFuncQt
+from XATime.XATCore import XATCore
 from XATime.ui.Ui_TerminalView import Ui_TerminalView
 
 __author__ = 'Marco Bartel'
 
 
-class TerminalView(QDialog, Ui_TerminalView):
+class TerminalView(XATCore, QDialog, Ui_TerminalView):
     MODUS_KOMMEN, MODUS_GEHEN, MODUS_PAUSE, MODUS_STATUS = range(4)
 
     modeTexts = {
@@ -33,9 +33,9 @@ class TerminalView(QDialog, Ui_TerminalView):
         MODUS_STATUS: ":/icons/status.svg"
     }
 
-
     def __init__(self, parent=None):
-        super(TerminalView, self).__init__(parent)
+        XATCore.__init__(self)
+        QDialog.__init__(self, parent)
         self.modeSlots = {
             self.MODUS_KOMMEN: self.slotKommen,
             self.MODUS_GEHEN: self.slotGehen,
@@ -43,33 +43,12 @@ class TerminalView(QDialog, Ui_TerminalView):
             self.MODUS_STATUS: self.slotStatus,
         }
 
-
-        self.loadConfig()
-
-
         self.inputString = ""
         self.setupUi(self)
         self.setupWidgets()
         self.setupTimer()
         self.setMode(self.MODUS_KOMMEN)
 
-    def dbQueryDict(self, sql):
-        con = pymysql.connect(
-            host=self.config["host"],
-            user=self.config["user"],
-            passwd=self.config["passwd"],
-            db=self.config["db"],
-        )
-        cur = con.cursor(pymysql.cursors.DictCursor)
-        cur.execute(sql)
-
-        ret = cur.fetchall()
-        con.close()
-
-        return ret
-
-    def loadConfig(self):
-        self.config = yaml.load(open("xatime.yaml"))["database"]
 
 
     def setupWidgets(self):
@@ -164,12 +143,10 @@ class TerminalView(QDialog, Ui_TerminalView):
         self.modeSlots[self.mode](badge.strip())
         self.setAllButtonsEnabled(True)
 
-    def slotKommen(self, badge):
-        sql = "select ID, NAME from xatime_badges where BADGE_NR='{badge}'".format(badge=badge)
-        r = self.dbQueryDict(sql)
-        if len(r) != 0:
-            d = r[0]
-            self.message("{name}\n\nKommen registriert.".format(name=d["NAME"]), 2)
+    def slotKommen(self, BADGE_NR):
+        badge = self.getBadgeByBadgeNumber( BADGE_NR)
+        if badge:
+            self.message("{name}\n\nKommen registriert.".format(name=badge.NAME), 2)
         else:
             self.message("Badge {badge}\n\nnicht erkannt.".format(badge=badge), 2)
 
