@@ -22,10 +22,14 @@ class Core(object):
 
     @classmethod
     def minutesToHourString(cls, minutes):
+        print minutes
         if minutes < 0:
             sign = "-"
+            minutes = minutes * -1
         else:
             sign = ""
+
+        print minutes, sign
 
         return "{sign}{hours}:{minutes:02}".format(
             sign=sign,

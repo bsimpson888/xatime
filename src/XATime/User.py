@@ -110,7 +110,7 @@ class User(object):
                 USER_ID=self.USER_ID
         )
         r = self.core.dbQueryDict(sql)
-        if len(r) == 0:
+        if len(r) != 0:
             return r[0]["MINUTES"]
         else:
             return 0
