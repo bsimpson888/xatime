@@ -163,7 +163,7 @@ class TerminalView(XATime.Core, QDialog, Ui_TerminalView):
                 ok = True
                 if self.mode in (XATime.Core.MODUS_KOMMEN, XATime.Core.MODUS_GEHEN, XATime.Core.MODUS_PAUSE):
                     now = self.now()
-                    user.newLog(mode=self.mode, logTime=now)
+                    user.newTimeLog(mode=self.mode, logTime=now)
                     self.message(
                         "{NAME}\n\n{MODE_NAME} registriert.\n\nZeit: {dt:%H:%M}".format(
                             NAME=user.NAME,
@@ -175,7 +175,15 @@ class TerminalView(XATime.Core, QDialog, Ui_TerminalView):
                     )
 
                 elif self.mode == XATime.Core.MODUS_STATUS:
-                    self.message("""{name}\n\nSaldo:\n(1) +35 Minuten\n(2) +230 Minuten""".format(name=user.NAME), 10, color=self.COLOR_OK)
+                    self.message(
+                        """{name}\n\n(1)  {acc1}     (2)  {acc2}""".format(
+                            name=user.NAME,
+                            acc1=self.minutesToHourString(user.getSaldoForAccount(1)),
+                            acc2=self.minutesToHourString(user.getSaldoForAccount(2)),
+                        ),
+                        10,
+                        color=self.COLOR_OK
+                    )
 
 
 

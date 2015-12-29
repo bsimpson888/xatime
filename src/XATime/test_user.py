@@ -38,4 +38,10 @@ class TestUser(TestCase):
     def test_newLog(self):
         user = XATime.User(core=self.core, USER_ID=1)
         self.assertIsInstance(user, XATime.User)
-        user.newLog(mode=XATime.Core.MODUS_KOMMEN, logTime=XATime.Core.now())
+        user.newTimeLog(mode=XATime.Core.MODUS_KOMMEN, logTime=XATime.Core.now())
+
+    def test_getCurrentSaldo(self):
+        user = XATime.User(core=self.core, USER_ID=1)
+        self.assertIsInstance(user, XATime.User)
+        self.assertIsInstance(user.getSaldoForAccount(2), int)
+

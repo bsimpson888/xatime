@@ -39,3 +39,5 @@ class TestBadge(TestCase):
         badge2 = user.getBadge()
         self.assertIsInstance(badge2, Badge)
         self.assertEqual(badge.BADGE_ID, badge2.BADGE_ID)
+
+

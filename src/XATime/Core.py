@@ -20,6 +20,19 @@ class Core(object):
     def now(self):
         return datetime.datetime.now().replace(second=0, microsecond=0)
 
+    @classmethod
+    def minutesToHourString(cls, minutes):
+        if minutes < 0:
+            sign = "-"
+        else:
+            sign = ""
+
+        return "{sign}{hours}:{minutes:02}".format(
+            sign=sign,
+            hours=int(minutes / 60),
+            minutes=minutes % 60
+        )
+
     def __init__(self):
         self.loadConfig()
 
@@ -59,3 +72,4 @@ class Core(object):
             return "'{dt:%Y-%m-%d  %H:%M:%S}'".format(dt=dt)
         else:
             return "null"
+
