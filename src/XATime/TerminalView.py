@@ -176,7 +176,7 @@ class TerminalView(XATime.Core, QDialog, Ui_TerminalView):
 
                 elif self.mode == XATime.Core.MODUS_STATUS:
                     self.message(
-                        """{name}\n\n(1)  {acc1}h     (2)  {acc2}h""".format(
+                        """{name}\n\nK1:  {acc1}h     K2:  {acc2}h""".format(
                             name=user.NAME,
                             acc1=self.minutesToHourString(user.getSaldoForAccount(1)),
                             acc2=self.minutesToHourString(user.getSaldoForAccount(2)),

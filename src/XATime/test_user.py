@@ -45,3 +45,11 @@ class TestUser(TestCase):
         self.assertIsInstance(user, XATime.User)
         self.assertIsInstance(user.getSaldoForAccount(2), int)
 
+    def test_assignVacation(self):
+        user = XATime.User(core=self.core, USER_ID=1)
+        self.assertIsInstance(user, XATime.User)
+        user.assignVacation(VACATION_TYPE_ID=1, AMOUNT=22, YEAR=2015)
+        user.assignVacation(VACATION_TYPE_ID=17, AMOUNT=3, YEAR=2016)
+        user.assignVacation(VACATION_TYPE_ID=5, AMOUNT=1, YEAR=2016)
+
+

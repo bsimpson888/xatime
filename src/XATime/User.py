@@ -1,5 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
+import datetime
+
 import XATime
 
 __author__ = 'Marco Bartel'
@@ -114,3 +116,48 @@ class User(object):
             return r[0]["MINUTES"]
         else:
             return 0
+
+    def assignVacation(self, VACATION_TYPE_ID, AMOUNT, YEAR=None):
+
+        if YEAR is None:
+            YEAR = datetime.date.today().year
+
+        vacationType = XATime.VacationType(core=self.core, VACATION_TYPE_ID=VACATION_TYPE_ID)
+
+        VALID_UNTIL = vacationType.VOID_DATE.replace(year=YEAR)
+        print type(VALID_UNTIL)
+
+        MINUTES = int(vacationType.MINUTES * AMOUNT)
+        while 1:
+            if MINUTES >= 480:
+                newMinutes = 480
+            else:
+                newMinutes = MINUTES
+
+            sql = """
+            insert into xatime_user_has_vacation(
+              USER_ID,
+              VACATION_TYPE_ID,
+              MINUTES,
+              MINUTES_TAKEN,
+              VALID_UNTIL,
+              CREATED
+            ) VALUES (
+              {USER_ID},
+              {VACATION_TYPE_ID},
+              {MINUTES},
+              0,
+              {VALID_UNTIL},
+              now()
+            )
+            """.format(
+                    USER_ID=self.USER_ID,
+                    VACATION_TYPE_ID=VACATION_TYPE_ID,
+                    MINUTES=newMinutes,
+                    VALID_UNTIL=self.core.mysqlDate(VALID_UNTIL)
+            )
+            self.core.dbQueryDict(sql)
+
+            MINUTES -= newMinutes
+            if MINUTES == 0:
+                break

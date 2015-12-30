@@ -27,14 +27,14 @@ class Core(object):
             sign = "-"
             minutes = minutes * -1
         else:
-            sign = ""
+            sign = "+"
 
         print minutes, sign
 
         return "{sign}{hours}:{minutes:02}".format(
-            sign=sign,
-            hours=int(minutes / 60),
-            minutes=minutes % 60
+                sign=sign,
+                hours=int(minutes / 60),
+                minutes=minutes % 60
         )
 
     def __init__(self):
@@ -70,10 +70,14 @@ class Core(object):
             return XATime.Badge(self, r[0]["BADGE_ID"])
         return None
 
-
     def mysqlDateTime(self, dt):
         if dt:
             return "'{dt:%Y-%m-%d  %H:%M:%S}'".format(dt=dt)
         else:
             return "null"
 
+    def mysqlDate(self, d):
+        if d:
+            return "'{d:%Y-%m-%d}'".format(d=d)
+        else:
+            return "null"
