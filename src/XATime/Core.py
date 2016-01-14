@@ -14,7 +14,10 @@ __author__ = 'Marco Bartel'
 class Core(object):
     configPath = "."
 
-    MODUS_KOMMEN, MODUS_GEHEN, MODUS_PAUSE, MODUS_STATUS = range(1, 5, 1)
+    MODUS_KOMMEN = 1
+    MODUS_GEHEN = 2
+    MODUS_PAUSE = 3
+    MODUS_STATUS = 4
 
     @classmethod
     def now(self):

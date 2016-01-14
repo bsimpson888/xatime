@@ -4,4 +4,4 @@ database:
   host: "esdb1.e-s.intern"
   user: "root"
   passwd: "dpaeiob"
-  db: "xatime"
+  db: "test_bartel"

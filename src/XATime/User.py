@@ -101,19 +101,23 @@ class User(object):
     def getSaldoForAccount(self, ACCOUNT_ID):
         sql = """
         SELECT
-          MINUTES
+          ACC1_MINUTES,
+          ACC2_MINUTES
         FROM xatime_account_changes
-        WHERE ACCOUNT_ID={ACCOUNT_ID}
-        AND USER_ID={USER_ID}
+        WHERE USER_ID={USER_ID}
         order by CHANGE_TIME desc
         limit 1
         """.format(
-                ACCOUNT_ID=ACCOUNT_ID,
                 USER_ID=self.USER_ID
         )
         r = self.core.dbQueryDict(sql)
         if len(r) != 0:
-            return r[0]["MINUTES"]
+            if ACCOUNT_ID == 1:
+                return r[0]["ACC1_MINUTES"]
+            elif ACCOUNT_ID == 2:
+                return r[0]["ACC2_MINUTES"]
+            else:
+                return 0
         else:
             return 0
 
@@ -125,7 +129,6 @@ class User(object):
         vacationType = XATime.VacationType(core=self.core, VACATION_TYPE_ID=VACATION_TYPE_ID)
 
         VALID_UNTIL = vacationType.VOID_DATE.replace(year=YEAR)
-        print type(VALID_UNTIL)
 
         MINUTES = int(vacationType.MINUTES * AMOUNT)
         while 1:
