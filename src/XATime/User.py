@@ -58,21 +58,21 @@ class User(object):
         return None
 
     def newTimeLog(self, mode=None, logTime=None, correction=0, correctionUser=None, correctionDate=None):
-        correctionUser = "'{CORRECTION_USER'".format(correctionUser) if correctionUser else "null"
+        correctionUser = "'{CORRECTION_USER_ID'".format(correctionUser) if correctionUser else "null"
         sql = """
         replace into xatime_time_logs(
         USER_ID,
         LOG_TIME,
         MODE,
         CORRECTION,
-        CORRECTION_USER,
+        CORRECTION_USER_ID,
         CORRECTION_DATE
         ) values (
         {USER_ID},
         {LOG_TIME},
         {MODE},
         {CORRECTION},
-        {CORRECTION_USER},
+        {CORRECTION_USER_ID},
         {CORRECTION_DATE}
         )
         """.format(
@@ -80,7 +80,7 @@ class User(object):
                 LOG_TIME=self.core.mysqlDateTime(logTime),
                 MODE=mode,
                 CORRECTION=correction,
-                CORRECTION_USER=correctionUser,
+                CORRECTION_USER_ID=correctionUser,
                 CORRECTION_DATE=self.core.mysqlDateTime(correctionDate)
         )
         r = self.core.dbQueryDict(sql)

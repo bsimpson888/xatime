@@ -60,6 +60,7 @@ class Core(object):
     def loadConfig(self):
         path = os.path.join(self.configPath, "xatime.yaml")
         self.config = yaml.load(open(path))["database"]
+        print self.config
 
     def getBadgeByBadgeNumber(self, BADGE_NR=None):
         sql = """
